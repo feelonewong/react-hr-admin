@@ -1,5 +1,7 @@
-import React from 'react';
-
+import React, {Fragment} from 'react';
+import {Button} from "antd";
+import "./Home.scss";
+// import "./../style/normalize.css";
 class Home extends  React.Component{
     constructor(props){
         super(props);
@@ -7,9 +9,11 @@ class Home extends  React.Component{
     }
     render(){
         return(
-            <div>
-                <h1>Home</h1>
-            </div>
+            <Fragment>
+                 <Button type="primary">
+                    Home
+                </Button>
+            </Fragment>
         )
     }
 }

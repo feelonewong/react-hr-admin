@@ -1,5 +1,5 @@
 import React from 'react';
-
+import {Button} from "antd";
 class About extends  React.Component{
     constructor(props){
         super(props);
@@ -8,7 +8,7 @@ class About extends  React.Component{
     render(){
         return(
             <div>
-                <h1>About</h1>
+                <Button type="primary">About</Button>
             </div>
         )
     }

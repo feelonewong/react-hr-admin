@@ -1,9 +1,8 @@
 import React from 'react';
-import { HashRouter, Switch, Route } from "react-router-dom";
-import "./style/normalize.css";
-import "./App.scss";
-import Home from "./views/Home";
-import About from "./views/About";
+// import { HashRouter, Switch, Route } from "react-router-dom";
+// import Home from "./views/Home";
+// import About from "./views/About";
+import Login from "./views/login/";
 
 
 class App extends React.Component {
@@ -13,14 +12,8 @@ class App extends React.Component {
   }
   render() {
     return (
-      <div className="wrapper">
-        <h1 className="title">213</h1>
-        <HashRouter>
-          <Switch>
-            <Route exact component={Home} path="/"></Route>
-            <Route component={About} path="/about"></Route>
-          </Switch>
-        </HashRouter>
+      <div>
+        <Login></Login>
       </div>
     )
   }
