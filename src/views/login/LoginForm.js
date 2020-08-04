@@ -1,22 +1,58 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Row, Col } from 'antd';
-import {validate_password_reg} from "../../utils/validate";
-import {Login} from "../../api/account";
+import {validate_password_reg,validate_email} from "../../utils/validate";
+import {Login, getCode} from "../../api/account";
 class LoginForm extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            username:"",
+            codeButtonDisabled: false,
+            codeButtonLoading: false,
+            codeButtonText:"获取验证码"
+        };
     }
     toggoleMenu = () => {
         this.props.toggleForm('register');
     };
+    usernameOnChange = (e) =>{
+        let value  = e.target.value;
+        this.setState({
+            username:value
+        })
+    }
+    getCode = ()=>{
+        if(!this.state.username){
+            message.error('用户名不能为空!');
+            return false;
+        }
+        this.setState({
+            codeButtonLoading: true,
+            codeButtonText:"发送中"
+        })
+        let requestData = {
+            username:"409019683@qq.com",
+            module:"login"
+        }
+        getCode(requestData).then( (response)=>{
+            // console.log(response.data)
+            
+        }).catch( err=>{
+            this.setState({
+                codeButtonLoading: false,
+                codeButtonText:"重新获取"
+            })
+            // console.log(err)
+        })
+    };
     onFinish = (values)=>{
         Login(values);
-        console.log('this.formObject:',values);
     }
     render() {
+        const {username, codeButtonDisabled,codeButtonLoading, codeButtonText} = this.state;
+        const _this = this;
         return (
             <Fragment>
                 <div className="login">
@@ -35,10 +71,29 @@ class LoginForm extends Component {
                                     name="username"
                                     rules={[
                                         { required: true, message: '邮箱地址不能为空!' },
-                                        { type: 'email', message: "邮箱格式不正确!" },
+                                        // { type: 'email', message: "邮箱格式不正确!" },
+                                        ({getFieldValue}) =>({
+                                            validator(rule,value){
+                                                    
+                                                if(  !validate_email(value)  ){
+                                                    _this.setState({
+                                                        codeButtonDisabled:true
+                                                    })
+                                                    return Promise.reject("邮箱格式不正确");
+                                                }else{
+                                                    _this.setState({
+                                                        codeButtonDisabled:false
+                                                    })
+                                                    return  Promise.resolve();
+                                                }
+                                            }
+                                        })
                                     ]}
                                 >
-                                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
+                                    <Input 
+                                    value={username}
+                                    onChange={this.usernameOnChange}
+                                    prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                                 </Form.Item>
                                 <Form.Item
                                     name="password"
@@ -62,11 +117,15 @@ class LoginForm extends Component {
                                     <Row gutter={13}>
                                         <Col span={15}>
                                             <Input 
-                                                
                                                 prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Code" />
                                         </Col>
                                         <Col span={9}>
-                                            <Button type="primary" block>获取验证码</Button>
+                                            <Button 
+                                                type="primary" 
+                                                block 
+                                                loading={codeButtonLoading}
+                                                disabled={codeButtonDisabled}
+                                                onClick={this.getCode}>{codeButtonText}</Button>
                                         </Col>
                                     </Row>
                                 </Form.Item>
