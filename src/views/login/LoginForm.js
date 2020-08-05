@@ -2,56 +2,84 @@ import React, { Component, Fragment } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Row, Col } from 'antd';
-import {validate_password_reg,validate_email} from "../../utils/validate";
-import {Login, getCode} from "../../api/account";
+import { validate_password_reg, validate_email } from "../../utils/validate";
+import { Login, getCode } from "../../api/account";
 class LoginForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username:"",
+            username: "",
             codeButtonDisabled: false,
             codeButtonLoading: false,
-            codeButtonText:"获取验证码"
+            codeButtonText: "获取验证码"
         };
     }
     toggoleMenu = () => {
         this.props.toggleForm('register');
     };
-    usernameOnChange = (e) =>{
-        let value  = e.target.value;
+    usernameOnChange = (e) => {
+        let value = e.target.value;
         this.setState({
-            username:value
+            username: value
         })
     }
-    getCode = ()=>{
-        if(!this.state.username){
+    getCode = () => {
+        if (!this.state.username) {
             message.error('用户名不能为空!');
             return false;
         }
+        
         this.setState({
             codeButtonLoading: true,
-            codeButtonText:"发送中"
-        })
+            codeButtonText: "发送中"
+        })  
+        
         let requestData = {
-            username:"409019683@qq.com",
-            module:"login"
+            username: this.state.username,
+            module: "login"
         }
-        getCode(requestData).then( (response)=>{
+        getCode(requestData).then((response) => {
             // console.log(response.data)
-            
-        }).catch( err=>{
+            this.countDown();
+            console.log(response.data);
+        }).catch(err => {
             this.setState({
                 codeButtonLoading: false,
-                codeButtonText:"重新获取"
+                codeButtonText: "重新获取"
             })
             // console.log(err)
         })
     };
-    onFinish = (values)=>{
+    countDown = () => {
+        let sec = 60;
+        this.setState({
+            codeButtonDisabled: true,
+            codeButtonText: `${sec}s`,
+            codeButtonLoading: false
+        })
+        let timer = null;
+
+        timer = setInterval(()=>{
+            sec--;
+            this.setState({
+                codeButtonDisabled: true,
+                codeButtonText: `${sec}s`
+            })
+            if(sec<=0){
+                this.setState({
+                    codeButtonDisabled: false,
+                    codeButtonText:"重新发送"
+                })
+                clearInterval(timer);
+                return false;
+            }
+        },1000)
+    }
+    onFinish = (values) => {
         Login(values);
     }
     render() {
-        const {username, codeButtonDisabled,codeButtonLoading, codeButtonText} = this.state;
+        const { username, codeButtonDisabled, codeButtonLoading, codeButtonText } = this.state;
         const _this = this;
         return (
             <Fragment>
@@ -64,7 +92,7 @@ class LoginForm extends Component {
                         <div className="form-content">
                             <Form
                                 name="normal_login"
-                                onFinish = {this.onFinish}
+                                onFinish={this.onFinish}
                                 initialValues={{ remember: true }}
                             >
                                 <Form.Item
@@ -72,28 +100,28 @@ class LoginForm extends Component {
                                     rules={[
                                         { required: true, message: '邮箱地址不能为空!' },
                                         // { type: 'email', message: "邮箱格式不正确!" },
-                                        ({getFieldValue}) =>({
-                                            validator(rule,value){
-                                                    
-                                                if(  !validate_email(value)  ){
+                                        ({ getFieldValue }) => ({
+                                            validator(rule, value) {
+
+                                                if (!validate_email(value)) {
                                                     _this.setState({
-                                                        codeButtonDisabled:true
+                                                        codeButtonDisabled: true
                                                     })
                                                     return Promise.reject("邮箱格式不正确");
-                                                }else{
+                                                } else {
                                                     _this.setState({
-                                                        codeButtonDisabled:false
+                                                        codeButtonDisabled: false
                                                     })
-                                                    return  Promise.resolve();
+                                                    return Promise.resolve();
                                                 }
                                             }
                                         })
                                     ]}
                                 >
-                                    <Input 
-                                    value={username}
-                                    onChange={this.usernameOnChange}
-                                    prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
+                                    <Input
+                                        value={username}
+                                        onChange={this.usernameOnChange}
+                                        prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                                 </Form.Item>
                                 <Form.Item
                                     name="password"
@@ -102,7 +130,7 @@ class LoginForm extends Component {
                                             required: true,
                                             message: '密码不能为空',
                                         },
-                                        {pattern: validate_password_reg, message:"密码必须由6-20数字和字母组成"}
+                                        { pattern: validate_password_reg, message: "密码必须由6-20数字和字母组成" }
                                     ]}
                                 >
                                     <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Password" />
@@ -110,19 +138,20 @@ class LoginForm extends Component {
                                 <Form.Item
                                     name="code"
                                     rules={[
-                                        {required: true, message:"验证码不能为空"},
-                                        {len:6,message:"验证码长度不正确"}
-                                      ]}
+                                        { required: true, message: "验证码不能为空" },
+                                        { len: 6, message: "验证码长度不正确" }
+                                    ]}
                                 >
                                     <Row gutter={13}>
                                         <Col span={15}>
-                                            <Input 
+                                            <Input
                                                 prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Code" />
                                         </Col>
                                         <Col span={9}>
-                                            <Button 
-                                                type="primary" 
-                                                block 
+                                            <Button
+                                                type="primary"
+                                                block
+                                              
                                                 loading={codeButtonLoading}
                                                 disabled={codeButtonDisabled}
                                                 onClick={this.getCode}>{codeButtonText}</Button>
