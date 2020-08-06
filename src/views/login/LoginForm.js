@@ -1,17 +1,16 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Row, Col } from 'antd';
 import { validate_password_reg, validate_email } from "../../utils/validate";
-import { Login, getCode } from "../../api/account";
+import { Login } from "../../api/account";
+import Code from "../../components/code/index";
 class LoginForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             username: "",
-            codeButtonDisabled: false,
-            codeButtonLoading: false,
-            codeButtonText: "获取验证码"
+            codeButtonDisabled: false
         };
     }
     toggoleMenu = () => {
@@ -23,63 +22,12 @@ class LoginForm extends Component {
             username: value
         })
     }
-    getCode = () => {
-        if (!this.state.username) {
-            message.error('用户名不能为空!');
-            return false;
-        }
-        
-        this.setState({
-            codeButtonLoading: true,
-            codeButtonText: "发送中"
-        })  
-        
-        let requestData = {
-            username: this.state.username,
-            module: "login"
-        }
-        getCode(requestData).then((response) => {
-            // console.log(response.data)
-            this.countDown();
-            console.log(response.data);
-        }).catch(err => {
-            this.setState({
-                codeButtonLoading: false,
-                codeButtonText: "重新获取"
-            })
-            // console.log(err)
-        })
-    };
-    countDown = () => {
-        let sec = 60;
-        this.setState({
-            codeButtonDisabled: true,
-            codeButtonText: `${sec}s`,
-            codeButtonLoading: false
-        })
-        let timer = null;
-
-        timer = setInterval(()=>{
-            sec--;
-            this.setState({
-                codeButtonDisabled: true,
-                codeButtonText: `${sec}s`
-            })
-            if(sec<=0){
-                this.setState({
-                    codeButtonDisabled: false,
-                    codeButtonText:"重新发送"
-                })
-                clearInterval(timer);
-                return false;
-            }
-        },1000)
-    }
+   
     onFinish = (values) => {
         Login(values);
     }
     render() {
-        const { username, codeButtonDisabled, codeButtonLoading, codeButtonText } = this.state;
+        const { username, codeButtonDisabled } = this.state;
         const _this = this;
         return (
             <Fragment>
@@ -87,6 +35,7 @@ class LoginForm extends Component {
                     <div className="form-wrapper">
                         <div className="form-header">
                             <h4 className="column">登录</h4>
+                    
                             <span className="account-register" onClick={this.toggoleMenu}>注册账号</span>
                         </div>
                         <div className="form-content">
@@ -99,7 +48,6 @@ class LoginForm extends Component {
                                     name="username"
                                     rules={[
                                         { required: true, message: '邮箱地址不能为空!' },
-                                        // { type: 'email', message: "邮箱格式不正确!" },
                                         ({ getFieldValue }) => ({
                                             validator(rule, value) {
 
@@ -148,13 +96,10 @@ class LoginForm extends Component {
                                                 prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Code" />
                                         </Col>
                                         <Col span={9}>
-                                            <Button
-                                                type="primary"
-                                                block
-                                              
-                                                loading={codeButtonLoading}
-                                                disabled={codeButtonDisabled}
-                                                onClick={this.getCode}>{codeButtonText}</Button>
+                                            <Code    
+                                                username={username} 
+                                                codeButtonDisabled={codeButtonDisabled}
+                                                />
                                         </Col>
                                     </Row>
                                 </Form.Item>
