@@ -2,7 +2,9 @@ import React, { Component, Fragment } from 'react';
 import { Form, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Row, Col } from 'antd';
-import { validate_password_reg, validate_email } from "../../utils/validate";
+import { Register } from "../../api/account";
+
+import { validate_passwords, validate_email } from "../../utils/validate";
 
 import Code from "../../components/code/index";
 
@@ -11,23 +13,39 @@ class RegisterForm extends Component {
         super(props);
         this.state = {
             username: "",
+            password: "",
+            passwords: "",
+            module:"register",
             codeButtonDisabled: false,
         };
     }
     toggleMenu = () => {
         this.props.toggleForm('login');
     }
-    onFinish = () =>{
-
+    onFinish = (value) => {
+        console.log(value,'value');
+        Register()
     }
-    usernameOnChange = (e)=>{
+    usernameOnChange = (e) => {
         let value = e.target.value;
         this.setState({
             username: value
         })
     }
+    passwordOnChange = (e) => {
+        let value = e.target.value;
+        this.setState({
+            password: value
+        })
+    }
+    passwordsOnChange = (e) => {
+        let value = e.target.value;
+        this.setState({
+            passwords: value
+        })
+    }
     render() {
-        let { username, codeButtonDisabled } = this.state;
+        let { username, codeButtonDisabled, password, passwords, module } = this.state;
         let _this = this;
         return (
             <Fragment>
@@ -45,12 +63,11 @@ class RegisterForm extends Component {
                             >
                                 <Form.Item
                                     name="username"
-
                                     rules={[
                                         { required: true, message: '邮箱地址不能为空!' },
                                         ({ getFieldValue }) => ({
                                             validator(rule, value) {
-    
+
                                                 if (!validate_email(value)) {
                                                     _this.setState({
                                                         codeButtonDisabled: true
@@ -66,10 +83,10 @@ class RegisterForm extends Component {
                                         })
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         value={username}
                                         onChange={this.usernameOnChange}
-                                        prefix={<UserOutlined className="site-form-item-icon" />} 
+                                        prefix={<UserOutlined className="site-form-item-icon" />}
                                         placeholder="Username" />
                                 </Form.Item>
                                 <Form.Item
@@ -77,28 +94,68 @@ class RegisterForm extends Component {
                                     rules={[
                                         {
                                             required: true,
-                                            message: '密码不能为空',
+                                            message: '密码不能为空!',
                                         },
-                                        { pattern: validate_password_reg, message: "密码必须由6-20数字和字母组成" }
+                                        ({ getFieldValue }) => ({
+                                            validator(role, value) {
+                                                if (!validate_passwords(value)) {
+                                                    return Promise.reject('密码格式不正确!');
+                                                }  
+                                                if (getFieldValue("passwords") && value !== getFieldValue("passwords")) {
+                                                    return Promise.reject("两次密码不一致!");
+                                                } 
+                                                    return Promise.resolve();
+                                            }
+                                        })
                                     ]}
                                 >
-                                    <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Password" />
+
+                                    <Input
+                                        value={password}
+                                        onChange={this.passwordOnChange}
+                                        prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Password" />
                                 </Form.Item>
                                 <Form.Item
-                                    name="password"
-                                    rules={[{ required: true, message: 'Please input your Password!' }]}
+                                    name="passwords"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '密码不能为空!',
+                                        },
+                                        ({ getFieldValue }) => ({
+                                            validator(role, value) {
+                                                if (!validate_passwords(value)) {
+                                                    return Promise.reject('密码格式不正确!');
+                                                } 
+                                                 if (getFieldValue('password')&&getFieldValue('password') !== value) {
+                                                    return Promise.reject("密码不一致!");
+                                                } 
+                                                    return Promise.resolve();
+                                                
+                                            }
+                                        })
+                                    ]}
                                 >
-                                    <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Password" />
+                                    <Input
+                                        value={passwords}
+                                        onChange={this.passwordsOnChange}
+                                        prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Password" />
                                 </Form.Item>
                                 <Form.Item
                                 >
                                     <Row gutter={13}>
                                         <Col span={15}>
-                                            <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Code" />
+                                            <Input 
+                                             rules={[
+                                                { required: true, message: "验证码不能为空" },
+                                                { len: 6, message: "验证码长度不正确" }
+                                            ]}
+                                            prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Code" />
                                         </Col>
                                         <Col span={9}>
                                             <Code
                                                 username={username}
+                                                module={module}
                                                 codeButtonDisabled={codeButtonDisabled}
                                             />
                                         </Col>

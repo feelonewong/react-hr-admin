@@ -10,7 +10,8 @@ class LoginForm extends Component {
         super(props);
         this.state = {
             username: "",
-            codeButtonDisabled: false
+            codeButtonDisabled: false,
+            module:"login"
         };
     }
     toggoleMenu = () => {
@@ -27,7 +28,7 @@ class LoginForm extends Component {
         Login(values);
     }
     render() {
-        const { username, codeButtonDisabled } = this.state;
+        const { username, codeButtonDisabled, module } = this.state;
         const _this = this;
         return (
             <Fragment>
@@ -98,6 +99,7 @@ class LoginForm extends Component {
                                         <Col span={9}>
                                             <Code    
                                                 username={username} 
+                                                module={module}
                                                 codeButtonDisabled={codeButtonDisabled}
                                                 />
                                         </Col>

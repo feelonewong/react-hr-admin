@@ -7,6 +7,7 @@ class Code extends Component{
         super(props)
         this.state = {
             username:"",
+            module:props.module,
             codeButtonLoading:false,
             codeButtonDisabled: false,
             codeButtonText: "获取验证码"
@@ -35,7 +36,7 @@ class Code extends Component{
         
         let requestData = {
             username:   this.state.username,
-            module: "login"
+            module: this.state.module
         }
         getCode(requestData).then((response) => {
             this.countDown();

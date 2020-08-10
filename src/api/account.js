@@ -7,6 +7,13 @@ export function Login(params){
         params
     })
 }
+export function Register(params){
+    return service.request({
+        url:"/register/",
+        methods:"post",
+        params
+    })
+}
 export function getCode(params){
     return service.request({
         url:"/getSms/",
