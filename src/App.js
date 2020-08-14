@@ -1,8 +1,7 @@
 import React from 'react';
-// import { HashRouter, Switch, Route } from "react-router-dom";
-// import Home from "./views/Home";
-// import About from "./views/About";
+import {  Switch, Route, BrowserRouter } from "react-router-dom";
 import Login from "./views/login/";
+import Index from "./views/Index/";
 
 
 class App extends React.Component {
@@ -12,9 +11,13 @@ class App extends React.Component {
   }
   render() {
     return (
-      <div>
-        <Login></Login>
-      </div>
+      <BrowserRouter>
+        <Switch>
+          <Route  exact component={Login} to="/" />
+          <Route   component={Index} to="/index" />
+        </Switch>
+      </BrowserRouter>
+      
     )
   }
 }

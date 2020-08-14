@@ -23,7 +23,6 @@ class Code extends Component{
         clearInterval(timer);
     }
     getCode = () => {
-        console.log(this.state.username,'---');
         if (!this.state.username) {
             message.error('用户名不能为空!');
             return false;
@@ -39,6 +38,7 @@ class Code extends Component{
             module: this.state.module
         }
         getCode(requestData).then((response) => {
+            message.success(response.data.message);
             this.countDown();
         }).catch(err => {
             this.setState({

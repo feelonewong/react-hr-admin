@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Row, Col } from 'antd';
 import { Register } from "../../api/account";
@@ -16,6 +16,7 @@ class RegisterForm extends Component {
             password: "",
             passwords: "",
             module:"register",
+            code:"",
             codeButtonDisabled: false,
         };
     }
@@ -23,8 +24,18 @@ class RegisterForm extends Component {
         this.props.toggleForm('login');
     }
     onFinish = (value) => {
-        console.log(value,'value');
-        Register()
+        let data = {
+            "username":value.username,
+            "password":value.password,
+            "code": this.state.code
+        }
+        
+        Register(data).then( (response)=>{
+            message.success(response.data.message);
+            this.toggleMenu();
+        }).catch( (err)=>{
+            
+        })
     }
     usernameOnChange = (e) => {
         let value = e.target.value;
@@ -44,8 +55,14 @@ class RegisterForm extends Component {
             passwords: value
         })
     }
+    codeOnChange = (e)=>{
+        let value = e.target.value;
+        this.setState({
+            code:value
+        })
+    }
     render() {
-        let { username, codeButtonDisabled, password, passwords, module } = this.state;
+        let { username, codeButtonDisabled, password,code, passwords, module } = this.state;
         let _this = this;
         return (
             <Fragment>
@@ -150,6 +167,8 @@ class RegisterForm extends Component {
                                                 { required: true, message: "验证码不能为空" },
                                                 { len: 6, message: "验证码长度不正确" }
                                             ]}
+                                            value={code}
+                                            onChange={this.codeOnChange}
                                             prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Code" />
                                         </Col>
                                         <Col span={9}>

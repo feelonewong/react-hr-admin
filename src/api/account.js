@@ -1,23 +1,23 @@
 import service from "../utils/request.js";
 
-export function Login(params){
+export function Login(data){
     return service.request({
         url:"/login/",
-        methods:"post",
-        params
+        method:"post",
+        data
     })
 }
-export function Register(params){
+export function Register(data){
     return service.request({
         url:"/register/",
-        methods:"post",
-        params
+        method:"post",
+        data
     })
 }
-export function getCode(params){
+export function getCode(data){
     return service.request({
         url:"/getSms/",
-        methods:"post",
-        params
+        method:"post",
+        data
     })
 }

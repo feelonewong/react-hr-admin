@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button,message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Row, Col } from 'antd';
 import { validate_password_reg, validate_email } from "../../utils/validate";
@@ -11,7 +11,8 @@ class LoginForm extends Component {
         this.state = {
             username: "",
             codeButtonDisabled: false,
-            module:"login"
+            module:"login",
+            code:""
         };
     }
     toggoleMenu = () => {
@@ -23,12 +24,29 @@ class LoginForm extends Component {
             username: value
         })
     }
-   
+    codeOnChange = (e)=>{
+        let value = e.target.value;
+        this.setState({
+            code: value
+        })
+    }
     onFinish = (values) => {
-        Login(values);
+        
+        let data = {
+            "username":values.username,
+            "password":values.password,
+            "code": this.state.code
+        }
+        
+        Login(data).then( (response)=>{
+            message.success(response.data.message);
+          
+        }).catch( (err)=>{
+            
+        })
     }
     render() {
-        const { username, codeButtonDisabled, module } = this.state;
+        const { username, codeButtonDisabled, module,code } = this.state;
         const _this = this;
         return (
             <Fragment>
@@ -90,6 +108,8 @@ class LoginForm extends Component {
                                         { required: true, message: "验证码不能为空" },
                                         { len: 6, message: "验证码长度不正确" }
                                     ]}
+                                    value={code}
+                                    onChange={this.codeOnChange}
                                 >
                                     <Row gutter={13}>
                                         <Col span={15}>
