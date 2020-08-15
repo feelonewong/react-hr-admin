@@ -2,9 +2,11 @@ import React, { Component, Fragment } from 'react';
 import { Form, Input, Button,message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Row, Col } from 'antd';
+import { withRouter } from "react-router-dom";
 import { validate_password_reg, validate_email } from "../../utils/validate";
 import { Login } from "../../api/account";
 import Code from "../../components/code/index";
+import {setToken} from "../../utils/session";
 class LoginForm extends Component {
     constructor(props) {
         super(props);
@@ -39,8 +41,10 @@ class LoginForm extends Component {
         }
         
         Login(data).then( (response)=>{
-            message.success(response.data.message);
-          
+           message.success(response.data.message);            
+           setToken(response.data.data.token);
+           this.props.history.push("/index")
+
         }).catch( (err)=>{
             
         })
@@ -138,4 +142,4 @@ class LoginForm extends Component {
 
 }
 
-export default LoginForm;
+export default withRouter(LoginForm);

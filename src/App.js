@@ -1,8 +1,8 @@
 import React from 'react';
-import {  Switch, Route, BrowserRouter } from "react-router-dom";
+import {BrowserRouter, Switch, Route} from "react-router-dom";
 import Login from "./views/login/";
 import Index from "./views/Index/";
-
+import PrivateRouter from "./components/PrivateRouter/index";
 
 class App extends React.Component {
   constructor(props) {
@@ -13,11 +13,10 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <Switch>
-          <Route  exact component={Login} to="/" />
-          <Route   component={Index} to="/index" />
+          <Route exact component={Login} path="/"></Route>
+          <PrivateRouter component={Index}></PrivateRouter>
         </Switch>
       </BrowserRouter>
-      
     )
   }
 }
