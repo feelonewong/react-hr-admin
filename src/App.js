@@ -14,7 +14,7 @@ class App extends React.Component {
       <BrowserRouter>
         <Switch>
           <Route exact component={Login} path="/"></Route>
-          <PrivateRouter component={Index}></PrivateRouter>
+          <PrivateRouter  component={Index}></PrivateRouter>
         </Switch>
       </BrowserRouter>
     )

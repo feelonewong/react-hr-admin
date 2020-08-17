@@ -2,6 +2,7 @@ import React,{ Component} from 'react';
 import {Layout} from 'antd';
 import SiderComponent from "../../components/LayoutCompoent/SiderComponent";
 import "./index.scss";
+import Container from "../../components/Container/index";
 const {Sider, Content, Header} = Layout;
 class Index extends Component{
     constructor(props){
@@ -18,7 +19,7 @@ class Index extends Component{
                     <Layout>
                         <Header className="layout-header">header</Header>
                         <Content className="layout-content">
-                            Content
+                            <Container/>
                         </Content>
                     </Layout>
                 </Layout>   
