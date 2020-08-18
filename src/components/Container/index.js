@@ -13,8 +13,6 @@ class Container extends React.Component {
         <Switch>
           <PrivateRouter  exact component={UserList} path="/index/user/list"></PrivateRouter>
           <PrivateRouter  exact component={UserAdd} path="/index/user/add"></PrivateRouter>
-                
-
         </Switch>
     )
   }
