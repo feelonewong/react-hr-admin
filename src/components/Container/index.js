@@ -1,8 +1,22 @@
 import React from 'react';
 import { Switch} from "react-router-dom";
 import PrivateRouter from "../PrivateRouter/index"; 
-import UserList from "../../views/User/index";
-import UserAdd from "../../views/User/Add";
+
+const components = [];
+const files = require.context("../../views",true,/\.js$/);
+files.keys().map( item=>{  
+  if(item.includes("./Index")||item.includes("./login")){
+    return false;
+  }
+  const jsonObj = {};
+  const path = `/index${item.split('.')[1]}`.toLowerCase();
+  const component = files(item).default;
+  jsonObj.path = path;
+  jsonObj.component = component;
+  components.push(jsonObj);
+  return '';
+})
+
 class Container extends React.Component {
   constructor(props) {
     super(props);
@@ -11,8 +25,10 @@ class Container extends React.Component {
   render() {
     return (
         <Switch>
-          <PrivateRouter  exact component={UserList} path="/index/user/list"></PrivateRouter>
-          <PrivateRouter  exact component={UserAdd} path="/index/user/add"></PrivateRouter>
+          {components.map(item=>{
+            return  (<PrivateRouter  exact  key={item.path} component={item.component} path={item.path} />)
+            
+          })}
         </Switch>
     )
   }
