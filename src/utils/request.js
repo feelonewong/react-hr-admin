@@ -5,8 +5,9 @@ import axios from 'axios';
  * 2.请求拦截
  * 3.响应拦截
 */
+const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/devApi';
 const service = axios.create({
-    baseURL: "devApi",
+    baseURL: BASEURL,
     timeout: 3000
 })
 

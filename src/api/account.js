@@ -21,3 +21,11 @@ export function getCode(data){
         data
     })
 }
+
+export function DepartmentAddSubmit(data){
+    return service.request({
+        url:"/department/add/",
+        method:"post",
+        data
+    })
+}

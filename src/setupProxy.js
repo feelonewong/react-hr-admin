@@ -10,9 +10,4 @@ module.exports = function(app){
             "^/devApi":""
         }
     }))
-    // app.use(proxy("/manage/api",{
-    //     /*配置请求的服务器地址*/
-    //     target:"http://admintest.happymall.com:7000",
-    //     changeOrigin:true
-    // }))
 }
