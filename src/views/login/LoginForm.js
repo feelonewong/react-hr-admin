@@ -6,7 +6,7 @@ import { withRouter } from "react-router-dom";
 import { validate_password_reg, validate_email } from "../../utils/validate";
 import { Login } from "../../api/account";
 import Code from "../../components/code/index";
-import {setToken} from "../../utils/session";
+import { setUsername, setToken } from "../../utils/cookie";
 class LoginForm extends Component {
     constructor(props) {
         super(props);
@@ -42,7 +42,8 @@ class LoginForm extends Component {
         
         Login(data).then( (response)=>{
            message.success(response.data.message);            
-           setToken(response.data.data.token);
+           setToken(response.data.data.token)
+           setUsername(this.state.username);
            this.props.history.push("/index")
 
         }).catch( (err)=>{

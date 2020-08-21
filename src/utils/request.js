@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import {getUsername,getToken} from "./cookie";
 /**
  * 1.创建实例
  * 2.请求拦截
@@ -12,6 +12,8 @@ const service = axios.create({
 })
 
 service.interceptors.request.use( function(config){
+    config.headers["Token"] = getToken();
+    config.headers["Username"] = getUsername();
     return config;
 },function(error){
     return Promise.reject(error);
