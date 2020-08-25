@@ -16,3 +16,12 @@ export function GetDepartmentList(data){
         data
     })
 }
+
+
+export function DeleteDepartmentList(data){
+    return service.request({
+        url:"/department/delete/",
+        method:"post",
+        data
+    })
+}

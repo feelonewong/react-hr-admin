@@ -7,3 +7,8 @@
  */
 @import "./sassConfig.scss";
 
+.inline-button{
+    button+button{
+        margin-left: 10px;
+    }
+}
