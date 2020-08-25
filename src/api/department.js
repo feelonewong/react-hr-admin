@@ -8,3 +8,11 @@ export function DepartmentAddSubmit(data){
         data
     })
 }
+
+export function GetDepartmentList(data){
+    return service.request({
+        url:"/department/list/",
+        method:"post",
+        data
+    })
+}

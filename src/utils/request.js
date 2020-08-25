@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {getUsername,getToken} from "./cookie";
-import {message } from "antd";
 /**
  * 1.创建实例
  * 2.请求拦截
@@ -22,13 +21,11 @@ service.interceptors.request.use( function(config){
 
 service.interceptors.response.use( function(config){
     const data = config.data;
-    if(!data.resCode){
-        message.info(data.message);
-        return Promise.reject(config);
-    }else{
-
+    if(data.resCode !== 0) { 
+        return Promise.reject(config)
+    } else { 
+        return config;
     }
-    return config;
 },function(error){
     return Promise.reject(error);
 })
