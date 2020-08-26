@@ -25,3 +25,11 @@ export function DeleteDepartmentList(data){
         data
     })
 }
+
+export function DepartmentStatus(data){
+    return service.request({
+        url:"/department/status/",
+        method:"post",
+        data
+    })
+}
