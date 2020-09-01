@@ -1,7 +1,9 @@
 import React, { Component } from "react";
-import { Form, Input, Button, Table, Switch, message, Modal } from "antd";
+import { Form, Input, Button, Table, Switch, message, Modal} from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+
 import { GetDepartmentList, DeleteDepartmentList, DepartmentStatus } from "@/api/department";
+import { Link } from "react-router-dom";
 class DeaprtmentList extends Component {
   constructor(props) {
     super(props);
@@ -11,6 +13,8 @@ class DeaprtmentList extends Component {
       pageSize: 10,
       selectRowKeys: [],
       rowSelection: {},
+      tableLoading:false,
+      id:"",
       columns: [
         { title: "部门名称", dataIndex: "name", key: "name" },
         {
@@ -20,8 +24,9 @@ class DeaprtmentList extends Component {
           render: (text, rowData) => {
             return (
               <Switch
-                checkedChildren="禁止"
-                unCheckedChildren="启用"
+                checkedChildren="启用"
+                unCheckedChildren="禁止"
+                loading={this.state.id === rowData.id}
                 defaultChecked={rowData.status === "1" ? true : false}
                 onChange={()=>{this.handleRadioChange(rowData)}}
               />
@@ -37,8 +42,11 @@ class DeaprtmentList extends Component {
           render: (text, rowData) => {
             return (
               <div className="inline-button">
-                <Button type="primary" onClick={()=>this.handleEdit(rowData)}>
-                  编辑
+                <Button type="primary">
+                  <Link to={{pathname:"/index/department/add",state:{id: rowData.id}}}>
+                    编辑
+                  </Link>
+                 
                 </Button>
                 <Button
                   danger
@@ -60,10 +68,7 @@ class DeaprtmentList extends Component {
   componentDidMount() {
     this.loadData();
   }
-  handleEdit=({id})=>{
-
-    this.props.history.push(`/index/department/add?id=${id}`);
-  }
+  
   handleSingleDelete = ({ id }) => {
     Modal.confirm({
       title: "删除",
@@ -85,6 +90,41 @@ class DeaprtmentList extends Component {
       onCancel() {},
     });
   };
+  handleBatchDelete = ()=>{
+    let selectIdArray = this.state.selectRowKeys;
+    console.log( this.state.selectRowKeys,'id')
+    if(!selectIdArray.length){
+      message.error("请先选择数据在进行操作");
+      return false;
+    }else{
+      Modal.confirm({
+        title: "删除",
+        icon: <ExclamationCircleOutlined />,
+        content: "确认要删除该条信息？",
+        okText: "是",
+        okType: "danger",
+        cancelText: "否",
+        onOk: () => {
+          const params = {
+            id: selectIdArray.join()
+          }
+          DeleteDepartmentList(params)
+            .then((response) => {
+              message.success(response.data.message);
+              this.setState({
+                selectRowKeys:[]
+              })
+            })
+            .catch((error) => {
+              
+              console.log(error);
+            });
+          this.loadData();
+        },
+        onCancel() {},
+      });
+    }
+  }
   loadData = () => {
     let params = {
       pageNumber: this.state.pageNumber,
@@ -93,14 +133,21 @@ class DeaprtmentList extends Component {
     if (this.state.name) {
       params.name = this.state.name;
     }
+    this.setState({
+      tableLoading: true
+    })
     GetDepartmentList(params)
       .then((response) => {
         const data = response.data.data.data;
         this.setState({
           data,
-        });
+          tableLoading: false
+        })
       })
       .catch((err) => {
+        this.setState({
+          tableLoading: false
+        })
         console.log(err);
       });
   };
@@ -113,12 +160,19 @@ class DeaprtmentList extends Component {
     }else{
         params.status = false;
     }
-    console.log(params);
     
-
-    DepartmentStatus(params).then( (response)=>{
+    this.setState({
+      id: rowData.id
+    })
+    DepartmentStatus(params).then( (response)=>{  
+        this.setState({
+          id: ""
+        })
         message.info(response.data.message);
     }).catch(err=>{
+        this.setState({
+          id: ""
+        })
         console.log(err)
     })
   }
@@ -141,16 +195,14 @@ class DeaprtmentList extends Component {
         selectRowKeys,
       },
       () => {
-        console.log("---", this.state.selectRowKeys);
       }
     );
-    console.log("ddd", this.state.selectRowKeys, selectRowKeys);
   };
   render() {
     const rowSelection = {
       onChange: this.onCheckBox,
     };
-    const { columns, data } = this.state;
+    const { columns, data, tableLoading } = this.state;
     return (
       <>
         <Form
@@ -170,12 +222,14 @@ class DeaprtmentList extends Component {
           </Form.Item>
         </Form>
         <Table
+          loading = {tableLoading}
           rowSelection={rowSelection}
           columns={columns}
           dataSource={data}
           rowKey="id"
           bordered
         ></Table>
+        <Button onClick={()=>{this.handleBatchDelete()}}>批量删除</Button>
       </>
     );
   }

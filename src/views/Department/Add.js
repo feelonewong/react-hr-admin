@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Input, Button, InputNumber,Radio, message } from "antd";
-import {DepartmentAddSubmit} from "../../api/account"
+import {DepartmentAddSubmit } from "../../api/account"
+import {DepartmentDetails, DepartmentEdit} from "@/api/department";
 const {TextArea} = Input;
 class DepartmentAdd extends Component {
     constructor(props) {
@@ -8,6 +9,7 @@ class DepartmentAdd extends Component {
         this.state = {
             status: false,
             number:1,
+            id:"",
             loading: false,
             formItemLayout: {
                 labelCol: { span: 2 },
@@ -19,6 +21,9 @@ class DepartmentAdd extends Component {
         this.setState({
             loading: true
         })
+        this.state.id?this.onHandleEdit(value):this.onHandleAdd(value);
+    }
+    onHandleAdd = (value)=>{
         DepartmentAddSubmit(value).then( response=>{
             const messageInfo = response.data.message;
             message.info(messageInfo);
@@ -32,6 +37,52 @@ class DepartmentAdd extends Component {
             })
             message.info(err);
         })
+    }
+    onHandleEdit = (value)=>{
+        
+        const id = this.state.id;
+        const params = {...value, id};
+        DepartmentEdit(params).then(response=>{
+            this.setState({
+                loading: false
+            })
+            message.success(response.data.message);
+        }).catch( error=>{
+            this.setState({
+                loading: false
+            })
+            message.info(error.data.message)
+            
+        })
+    }
+    
+    getDepartDetails=(id)=>{
+        const params = {id}
+        DepartmentDetails(params).then( response=>{
+            const data = response.data.data;
+            const {name, content , number, status  } = data;
+            this.refs.form.setFieldsValue({
+                name,content,number,status
+            })
+
+
+        }).catch(error=>{
+            console.log(error);
+        })
+    }
+    componentWillMount(){
+        if(this.props.location.state){    
+            this.setState({
+                id:this.props.location.state.id
+            })
+        }
+    }
+
+    componentDidMount(){
+        if(this.props.location.state){
+            const id = this.props.location.state.id;
+            this.getDepartDetails(id);
+        }
     }
     render() {
         const { formItemLayout,status,loading } = this.state;

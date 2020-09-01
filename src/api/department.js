@@ -33,3 +33,20 @@ export function DepartmentStatus(data){
         data
     })
 }
+
+
+export function DepartmentDetails(data){
+    return service.request({
+        url:"/department/detailed/",
+        method:"post",
+        data
+    })
+}
+
+export function DepartmentEdit(data){
+    return service.request({
+        url:"/department/edit/",
+        method:"post",
+        data
+    })
+}
