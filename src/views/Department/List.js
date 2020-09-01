@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import { Form, Input, Button, Table, Switch, message, Modal} from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-
 import { GetDepartmentList, DeleteDepartmentList, DepartmentStatus } from "@/api/department";
 import { Link } from "react-router-dom";
+//Component
+import TableComponent from "@/components/tableComponent/TableComponent";
+import requestURL from "@/api/requestURL";
+
 class DeaprtmentList extends Component {
   constructor(props) {
     super(props);
@@ -12,61 +15,66 @@ class DeaprtmentList extends Component {
       pageNumber: 1,
       pageSize: 10,
       selectRowKeys: [],
-      rowSelection: {},
+     
       tableLoading:false,
       id:"",
-      columns: [
-        { title: "部门名称", dataIndex: "name", key: "name" },
-        {
-          title: "禁启用",
-          dataIndex: "status",
-          key: "status",
-          render: (text, rowData) => {
-            return (
-              <Switch
-                checkedChildren="启用"
-                unCheckedChildren="禁止"
-                loading={this.state.id === rowData.id}
-                defaultChecked={rowData.status === "1" ? true : false}
-                onChange={()=>{this.handleRadioChange(rowData)}}
-              />
-            );
+      tableConfig:{
+        hasCheckBox:true,
+        url: requestURL.departmentList,
+        rowKey:"id",
+        tHead: [
+          { title: "部门名称", dataIndex: "name", key: "name" },
+          {
+            title: "禁启用",
+            dataIndex: "status",
+            key: "status",
+            render: (text, rowData) => {
+              return (
+                <Switch
+                  checkedChildren="启用"
+                  unCheckedChildren="禁止"
+                  loading={this.state.id === rowData.id}
+                  defaultChecked={rowData.status === "1" ? true : false}
+                  onChange={()=>{this.handleRadioChange(rowData)}}
+                />
+              );
+            },
           },
-        },
-        { title: "人员数量", dataIndex: "number", key: "number" },
-        {
-          title: "操作",
-          dataIndex: "operation",
-          key: "operation",
-          width: 300,
-          render: (text, rowData) => {
-            return (
-              <div className="inline-button">
-                <Button type="primary">
-                  <Link to={{pathname:"/index/department/add",state:{id: rowData.id}}}>
-                    编辑
-                  </Link>
-                 
-                </Button>
-                <Button
-                  danger
-                  type="primary"
-                  onClick={() => {
-                    this.handleSingleDelete(rowData);
-                  }}
-                >
-                  删除
-                </Button>
-              </div>
-            );
+          { title: "人员数量", dataIndex: "number", key: "number" },
+          {
+            title: "操作",
+            dataIndex: "operation",
+            key: "operation",
+            width: 300,
+            render: (text, rowData) => {
+              return (
+                <div className="inline-button">
+                  <Button type="primary">
+                    <Link to={{pathname:"/index/department/add",state:{id: rowData.id}}}>
+                      编辑
+                    </Link>
+                   
+                  </Button>
+                  <Button
+                    danger
+                    type="primary"
+                    onClick={() => {
+                      this.handleSingleDelete(rowData);
+                    }}
+                  >
+                    删除
+                  </Button>
+                </div>
+              );
+            },
           },
-        },
-      ],
-      data: [],
+        ]
+      },
+     
     };
   }
   componentDidMount() {
-    this.loadData();
+  //  this.loadData();
   }
   
   handleSingleDelete = ({ id }) => {
@@ -92,7 +100,6 @@ class DeaprtmentList extends Component {
   };
   handleBatchDelete = ()=>{
     let selectIdArray = this.state.selectRowKeys;
-    console.log( this.state.selectRowKeys,'id')
     if(!selectIdArray.length){
       message.error("请先选择数据在进行操作");
       return false;
@@ -199,10 +206,8 @@ class DeaprtmentList extends Component {
     );
   };
   render() {
-    const rowSelection = {
-      onChange: this.onCheckBox,
-    };
-    const { columns, data, tableLoading } = this.state;
+   
+    const { columns,  tableLoading, tableConfig } = this.state;
     return (
       <>
         <Form
@@ -221,13 +226,10 @@ class DeaprtmentList extends Component {
             </Button>
           </Form.Item>
         </Form>
+        <TableComponent    config={tableConfig}  columns={columns} />
         <Table
           loading = {tableLoading}
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={data}
-          rowKey="id"
-          bordered
+       
         ></Table>
         <Button onClick={()=>{this.handleBatchDelete()}}>批量删除</Button>
       </>
