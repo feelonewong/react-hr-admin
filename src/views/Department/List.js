@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Input, Button, Table, Switch, message, Modal} from "antd";
+import { Form, Input, Button,  Switch, message, Modal} from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { GetDepartmentList, DeleteDepartmentList, DepartmentStatus } from "@/api/department";
 import { Link } from "react-router-dom";
@@ -16,10 +16,10 @@ class DeaprtmentList extends Component {
       pageSize: 10,
       selectRowKeys: [],
      
-      tableLoading:false,
       id:"",
       tableConfig:{
         hasCheckBox:true,
+        btchButton: true,
         url: requestURL.departmentList,
         rowKey:"id",
         tHead: [
@@ -140,9 +140,7 @@ class DeaprtmentList extends Component {
     if (this.state.name) {
       params.name = this.state.name;
     }
-    this.setState({
-      tableLoading: true
-    })
+    
     GetDepartmentList(params)
       .then((response) => {
         const data = response.data.data.data;
@@ -207,7 +205,7 @@ class DeaprtmentList extends Component {
   };
   render() {
    
-    const { columns,  tableLoading, tableConfig } = this.state;
+    const { columns,   tableConfig } = this.state;
     return (
       <>
         <Form
@@ -227,11 +225,8 @@ class DeaprtmentList extends Component {
           </Form.Item>
         </Form>
         <TableComponent    config={tableConfig}  columns={columns} />
-        <Table
-          loading = {tableLoading}
        
-        ></Table>
-        <Button onClick={()=>{this.handleBatchDelete()}}>批量删除</Button>
+        {/* <Button onClick={()=>{this.handleBatchDelete()}}>批量删除</Button> */}
       </>
     );
   }
