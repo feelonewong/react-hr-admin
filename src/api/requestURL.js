@@ -1,5 +1,6 @@
 const requestURL = {
-    "departmentList":"/department/list/"
+    "departmentList":"/department/list/",
+    "tableDelete":"/department/delete/"
 }
 
 export default requestURL;

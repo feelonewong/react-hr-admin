@@ -1,6 +1,9 @@
 import React, { Component } from "react";
-import { Table, Row, Col, Button, Pagination } from "antd";
+import { Table, Row, Col, Button, Pagination, message, Modal } from "antd";
 import { GetDepartmentList } from "@/api/department";
+import {TableDelete} from "@/api/common";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import requestURL from "@/api/requestURL";
 import propTypes from "prop-types";
 
 class TableComponent extends Component {
@@ -22,6 +25,7 @@ class TableComponent extends Component {
       columns: this.props.config.tHead,
     });
     this.loadData();
+    this.props.onRef(this);
   }
   loadData = () => {
     this.setState({
@@ -58,6 +62,32 @@ class TableComponent extends Component {
       }
     );
   };
+  handleDelete = (callBackParams)=>{
+       Modal.confirm({
+      title: "删除",
+      icon: <ExclamationCircleOutlined />,
+      content: "确认要删除该条信息？",
+      okText: "是",
+      okType: "danger",
+      cancelText: "否",
+      onOk: () => {
+      let {id} = callBackParams; 
+      const params = {
+        id: id,
+        url: requestURL.tableDelete
+      }
+        TableDelete(params)
+          .then((response) => {
+            message.success(response.data.message);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.loadData();
+      },
+      onCancel() {},
+    });
+  };
   onPaginationChange = (value) => {
     this.setState({
       pageNumber:value
@@ -66,8 +96,40 @@ class TableComponent extends Component {
       this.loadData();
     })
   }
-  handleBatchDelete = () => {
-  
+  handleBatchDelete = ()=>{
+    let selectIdArray = this.state.selectRowKeys;
+    if(!selectIdArray.length){
+      message.error("请先选择数据在进行操作");
+      return false;
+    }else{
+      Modal.confirm({
+        title: "删除",
+        icon: <ExclamationCircleOutlined />,
+        content: "确认要删除该条信息？",
+        okText: "是",
+        okType: "danger",
+        cancelText: "否",
+        onOk: () => {
+          const params = {
+            id: selectIdArray.join(),
+            url: requestURL.tableDelete
+          }
+          TableDelete(params)
+            .then((response) => {
+              message.success(response.data.message);
+              this.setState({
+                selectRowKeys:[]
+              })
+            })
+            .catch((error) => {
+              
+              console.log(error);
+            });
+          this.loadData();
+        },
+        onCancel() {},
+      });
+    }
   }
   onShowSizeChange = (current,value)=>{
     this.setState({
@@ -104,7 +166,7 @@ class TableComponent extends Component {
                   showQuickJumper 
                   showSizeChanger
                   defaultCurrent={1} 
-                  total={totalCount} 
+                  showTotal={total => `Total ${totalCount} items`}
                   onChange={this.onPaginationChange} />
             </Row>
 

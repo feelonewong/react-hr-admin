@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Form, Input, Button,  Switch, message, Modal} from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { GetDepartmentList, DeleteDepartmentList, DepartmentStatus } from "@/api/department";
+import { DeleteDepartmentList, DepartmentStatus } from "@/api/department";
 import { Link } from "react-router-dom";
 //Component
 import TableComponent from "@/components/tableComponent/TableComponent";
@@ -76,85 +76,13 @@ class DeaprtmentList extends Component {
   componentDidMount() {
   //  this.loadData();
   }
-  
-  handleSingleDelete = ({ id }) => {
-    Modal.confirm({
-      title: "删除",
-      icon: <ExclamationCircleOutlined />,
-      content: "确认要删除该条信息？",
-      okText: "是",
-      okType: "danger",
-      cancelText: "否",
-      onOk: () => {
-        DeleteDepartmentList({ id })
-          .then((response) => {
-            message.success(response.data.message);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        this.loadData();
-      },
-      onCancel() {},
-    });
-  };
-  handleBatchDelete = ()=>{
-    let selectIdArray = this.state.selectRowKeys;
-    if(!selectIdArray.length){
-      message.error("请先选择数据在进行操作");
-      return false;
-    }else{
-      Modal.confirm({
-        title: "删除",
-        icon: <ExclamationCircleOutlined />,
-        content: "确认要删除该条信息？",
-        okText: "是",
-        okType: "danger",
-        cancelText: "否",
-        onOk: () => {
-          const params = {
-            id: selectIdArray.join()
-          }
-          DeleteDepartmentList(params)
-            .then((response) => {
-              message.success(response.data.message);
-              this.setState({
-                selectRowKeys:[]
-              })
-            })
-            .catch((error) => {
-              
-              console.log(error);
-            });
-          this.loadData();
-        },
-        onCancel() {},
-      });
-    }
+  // get child Component
+  getChildRef = (ref)=>{
+    this.TableComponent = ref;
   }
-  loadData = () => {
-    let params = {
-      pageNumber: this.state.pageNumber,
-      pageSize: this.state.pageSize,
-    };
-    if (this.state.name) {
-      params.name = this.state.name;
-    }
-    
-    GetDepartmentList(params)
-      .then((response) => {
-        const data = response.data.data.data;
-        this.setState({
-          data,
-          tableLoading: false
-        })
-      })
-      .catch((err) => {
-        this.setState({
-          tableLoading: false
-        })
-        console.log(err);
-      });
+
+  handleSingleDelete = ({ id }) => {
+    this.TableComponent.handleDelete({id})
   };
   handleRadioChange = (rowData)=>{
     const params = {
@@ -224,7 +152,7 @@ class DeaprtmentList extends Component {
             </Button>
           </Form.Item>
         </Form>
-        <TableComponent    config={tableConfig}  columns={columns} />
+        <TableComponent   onRef={this.getChildRef}   config={tableConfig}  columns={columns} />
        
         {/* <Button onClick={()=>{this.handleBatchDelete()}}>批量删除</Button> */}
       </>

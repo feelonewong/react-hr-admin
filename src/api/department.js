@@ -11,7 +11,9 @@ export function DepartmentAddSubmit(data){
 
 export function GetDepartmentList(data){
     return service.request({
-        url:data.url,
+        url:data.url
+        
+        ,
         method:"post",
         data
     })
