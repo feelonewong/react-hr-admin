@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { Form, Input, Button,  Switch, message, Modal} from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { DeleteDepartmentList, DepartmentStatus } from "@/api/department";
+import { Button,  Switch, message} from "antd";
+import { DepartmentStatus } from "@/api/department";
 import { Link } from "react-router-dom";
 //Component
 import TableComponent from "@/components/tableComponent/TableComponent";
@@ -109,19 +108,8 @@ class DeaprtmentList extends Component {
         console.log(err)
     })
   }
-  onFinish = (value) => {
-    this.setState({
-      pageSize: 10,
-      pageNumber: 1,
-    });
-    this.loadData();
-  };
-  nameOnChange = (e) => {
-    let value = e.target.value;
-    this.setState({
-      name: value,
-    });
-  };
+
+  
   onCheckBox = (selectRowKeys) => {
     this.setState(
       {
@@ -136,25 +124,7 @@ class DeaprtmentList extends Component {
     const { columns,   tableConfig } = this.state;
     return (
       <>
-        <Form
-          style={{ marginBottom: "20px" }}
-          ref="form"
-          layout="inline"
-          onFinish={this.onFinish}
-          initialValues={this.state}
-        >
-          <Form.Item label="部门名称" value="name" onChange={this.nameOnChange}>
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              搜索
-            </Button>
-          </Form.Item>
-        </Form>
         <TableComponent   onRef={this.getChildRef}   config={tableConfig}  columns={columns} />
-       
-        {/* <Button onClick={()=>{this.handleBatchDelete()}}>批量删除</Button> */}
       </>
     );
   }

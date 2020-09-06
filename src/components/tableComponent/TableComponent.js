@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Table, Row, Col, Button, Pagination, message, Modal } from "antd";
+import { Form, Input, Button, message, Modal } from "antd";
 import { GetDepartmentList } from "@/api/department";
-import {TableDelete} from "@/api/common";
+import { TableDelete } from "@/api/common";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import requestURL from "@/api/requestURL";
 import propTypes from "prop-types";
-
+import TableBasis from "./TableUI";
 class TableComponent extends Component {
   constructor(props) {
     super(props);
@@ -16,8 +16,10 @@ class TableComponent extends Component {
       data: [],
       columns: [],
       id: "",
-      totalCount:0,
+      totalCount: 0,
+      name: "",
       selectRowKeys: [],
+      keywords:""
     };
   }
   componentDidMount() {
@@ -35,6 +37,7 @@ class TableComponent extends Component {
       pageNumber: this.state.pageNumber,
       pageSize: this.state.pageSize,
       url: this.props.config.url,
+      name:this.state.keywords,
     };
 
     GetDepartmentList(params)
@@ -44,13 +47,13 @@ class TableComponent extends Component {
         this.setState({
           data,
           totalCount,
-          tableLoading: false
+          tableLoading: false,
         });
       })
       .catch((err) => {
         this.setState({
-          tableLoading: false
-        })
+          tableLoading: false,
+        });
       });
   };
   onCheckbox = (selectRowKeys) => {
@@ -58,12 +61,11 @@ class TableComponent extends Component {
       {
         selectRowKeys,
       },
-      () => {
-      }
+      () => {}
     );
   };
-  handleDelete = (callBackParams)=>{
-       Modal.confirm({
+  handleDelete = (callBackParams) => {
+    Modal.confirm({
       title: "删除",
       icon: <ExclamationCircleOutlined />,
       content: "确认要删除该条信息？",
@@ -71,11 +73,11 @@ class TableComponent extends Component {
       okType: "danger",
       cancelText: "否",
       onOk: () => {
-      let {id} = callBackParams; 
-      const params = {
-        id: id,
-        url: requestURL.tableDelete
-      }
+        let { id } = callBackParams;
+        const params = {
+          id: id,
+          url: requestURL.tableDelete,
+        };
         TableDelete(params)
           .then((response) => {
             message.success(response.data.message);
@@ -89,19 +91,22 @@ class TableComponent extends Component {
     });
   };
   onPaginationChange = (value) => {
-    this.setState({
-      pageNumber:value
-    },()=>{
-      console.log(this.state.pageNumber,this.state.pageSize);
-      this.loadData();
-    })
-  }
-  handleBatchDelete = ()=>{
+    this.setState(
+      {
+        pageNumber: value,
+      },
+      () => {
+        console.log("pagination");
+        this.loadData();
+      }
+    );
+  };
+  handleBatchDelete = () => {
     let selectIdArray = this.state.selectRowKeys;
-    if(!selectIdArray.length){
+    if (!selectIdArray.length) {
       message.error("请先选择数据在进行操作");
       return false;
-    }else{
+    } else {
       Modal.confirm({
         title: "删除",
         icon: <ExclamationCircleOutlined />,
@@ -112,71 +117,87 @@ class TableComponent extends Component {
         onOk: () => {
           const params = {
             id: selectIdArray.join(),
-            url: requestURL.tableDelete
-          }
+            url: requestURL.tableDelete,
+          };
           TableDelete(params)
             .then((response) => {
               message.success(response.data.message);
               this.setState({
-                selectRowKeys:[]
-              })
+                selectRowKeys: [],
+              });
             })
-            .catch((error) => {
-              
-              console.log(error);
-            });
+            .catch((error) => {});
           this.loadData();
         },
         onCancel() {},
       });
     }
-  }
-  onShowSizeChange = (current,value)=>{
+  };
+  onShowSizeChange = (current, value) => {
+    this.setState(
+      {
+        pageSize: value,
+      },
+      () => {
+        this.onPaginationChange(1);
+      }
+    );
+  };
+
+  onFinish = (value) => {
     this.setState({
-      pageSize:value
-    },()=>{
-      this.onPaginationChange(1);
+      keywords:value.name
     })
-  }
+    if (this.state.tableLoading) {
+      return false;
+    }
+    this.setState({
+      pageSize: 10,
+      pageNumber: 1,
+    });
+    this.loadData();
+  };
   render() {
     const { columns, data, tableLoading, totalCount } = this.state;
-    const { hasCheckBox, rowKey, btchButton } = this.props.config;
+    const { hasCheckBox } = this.props.config;
     const rowSelection = {
       onChange: this.onCheckbox,
     };
     return (
       <>
-        <Table
-          rowSelection={hasCheckBox ? rowSelection : null}
-          rowKey={rowKey || "id"}
-          loading={tableLoading}
-          pagination={false}
-          dataSource={data}
-          columns={columns}
-          bordered
-        ></Table>
-        <Row justify="space-between" style={{ marginTop: "20px" }}>
-          <Col span={4} >
-            {btchButton && <Button type="danger" onClick={() => { this.handleBatchDelete() }}>批量删除</Button>}
-          </Col>
-          <Col span={20}  >
-            <Row justify="end">
-              <Pagination 
-                  onShowSizeChange={this.onShowSizeChange}
-                  showQuickJumper 
-                  showSizeChanger
-                  defaultCurrent={1} 
-                  showTotal={total => `Total ${totalCount} items`}
-                  onChange={this.onPaginationChange} />
-            </Row>
+        <Form
+          layout="inline"
+          onFinish={this.onFinish}
+          style={{ marginBottom: "20px" }}
+        >
+          <Form.Item label="部门名称" name="name">
+            <Input placeholder="请输入部门名称" />
+          </Form.Item>
+          <Form.Item shouldUpdate={true}>
+            <Button type="primary" htmlType="submit">
+              搜索
+            </Button>
+          </Form.Item>
+        </Form>
 
-          </Col>
-        </Row>
+        <TableBasis
+          columns={columns}
+          dataSource={data}
+          btchButton={this.props.config.btchButton}
+          handleBatchDelete={() => {
+            this.handleBatchDelete();
+          }}
+          changePageCurrent={this.onPaginationChange}
+          onShowSizeChange={this.onShowSizeChange}
+          totalCount={totalCount}
+          tableLoading={tableLoading}
+          rowSelection={hasCheckBox ? rowSelection : null}
+        />
       </>
     );
   }
 }
 TableComponent.propTypes = {
-  config: propTypes.object
-}
+  config: propTypes.object,
+};
 export default TableComponent;
