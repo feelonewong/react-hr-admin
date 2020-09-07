@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Form, Input, Button, InputNumber,Radio, message } from "antd";
 import {DepartmentAddSubmit } from "../../api/account"
 import {DepartmentDetails, DepartmentEdit} from "@/api/department";
+//form component
+import FormComponent from "@/components/formComponent/Index";
+
 const {TextArea} = Input;
 class DepartmentAdd extends Component {
     constructor(props) {
@@ -14,7 +17,43 @@ class DepartmentAdd extends Component {
             formItemLayout: {
                 labelCol: { span: 2 },
                 wrapperCol: { span: 14 },
-            }
+            },
+            formConfig:[
+                {   type:"Input", 
+                    label:"部门名称", 
+                    name:"name",
+                    rule:[{ required: true, message: '部门名称不能为空!' }]
+                },
+                {   type:"Select", 
+                    label:"人员数量", 
+                    name:"number",
+                    min:1,
+                    max:100,
+                    rule:[
+                        { required: true, message: '人数不能为空!' },
+                        ({ getFieldValue }) => ({
+                            validator(rule, value) {
+                                
+                                if (!value) {
+                                    return Promise.reject("人数不能少于1");
+                                } else {
+                                    return Promise.resolve();
+                                }
+                            }
+                        })
+                    ]
+                },
+                {
+                    type:"Button",
+                    name:"Button",
+                    htmlType:"submit"
+                },
+                {
+                    type:"Radio",
+                    name:"Status",
+                    label:"禁启用"
+                }
+            ]
         }
     }
     onFinish = (value) => {
@@ -85,9 +124,10 @@ class DepartmentAdd extends Component {
         }
     }
     render() {
-        const { formItemLayout,status,loading } = this.state;
+        const { formItemLayout,status,loading,formConfig } = this.state;
         return (
             <>
+                <FormComponent formConfig={formConfig}/>
                 <Form
                     ref="form"
                     {...formItemLayout}
